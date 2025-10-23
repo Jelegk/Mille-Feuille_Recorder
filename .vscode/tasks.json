@@ -1,0 +1,34 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build MILLE_FEUILLE RECORDER",
+            "command": "C:/msys64/ucrt64/bin/g++.exe",
+            "args": [
+                "-Wall", "-Wextra", "-pedantic", "-Wshadow", "-Werror",
+                "-fdiagnostics-color=always",
+                "-g",
+                "-I", "${workspaceFolder}/include",
+                "-I", "${workspaceFolder}/include/imgui-1.92.4",
+                "${workspaceFolder}/src/Events.cpp",
+                "${workspaceFolder}/src/Render.cpp",
+                "${workspaceFolder}/src/main.cpp",
+                "-L", "${workspaceFolder}/lib",
+                "-l", "imgui",
+                "-l", "SDL3.dll",
+                "-o", "${workspaceFolder}/build/Mille-Feuille Recorder.exe"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ],
+    "version": "2.0.0"
+}
