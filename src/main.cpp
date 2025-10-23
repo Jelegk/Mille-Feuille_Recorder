@@ -15,7 +15,8 @@
 
 // MARK: SDL_AppInit
 SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
-  SDL_SetAppMetadata("Mille-Feuille Recorder", "1.0", "com.gde.milfeuille-rec");
+  if (!SDL_SetAppMetadata("Mille-Feuille Recorder", "1.0", "com.gde.milfeuille-rec"))
+    SDL_Log("Warning: SDL_SetAppMetadata(): %s\n", SDL_GetError());
 
   AppState *app = new AppState();
   *appstate = app;
@@ -28,7 +29,7 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
 
   float           winScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
   SDL_WindowFlags winFlags = SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY | SDL_WINDOW_TRANSPARENT;
-  if (!SDL_CreateWindowAndRenderer("Mille-Feuille Recorder", int(600 * winScale), int(400 * winScale), winFlags, &app->window, &app->renderer)) {
+  if (!SDL_CreateWindowAndRenderer("Mille-Feuille Recorder", int(app->winWidth * winScale), int(app->winHeight * winScale), winFlags, &app->window, &app->renderer)) {
     SDL_Log("Error: SDL_CreateWindowAndRenderer(): %s\n", SDL_GetError());
     return SDL_APP_FAILURE;
   }
@@ -36,8 +37,10 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
   if (!SDL_SetRenderVSync(app->renderer, 1))
     SDL_Log("Warning: SDL_SetRenderVSync(): %s\n", SDL_GetError());
 
-  SDL_SetWindowPosition(app->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-  SDL_ShowWindow(app->window);
+  if (!SDL_SetWindowPosition(app->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED))
+    SDL_Log("Warning: SDL_SetWindowPosition(): %s\n", SDL_GetError());
+  if (!SDL_ShowWindow(app->window))
+    SDL_Log("Error: SDL_ShowWindow(): %s\n", SDL_GetError());
 
   // -------------------------------- ImGUI ------------------------------------
   IMGUI_CHECKVERSION();
@@ -62,7 +65,9 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
   app->imGuiIO->Fonts->AddFontDefault();
   ImFont *font = app->imGuiIO->Fonts->AddFontFromMemoryCompressedTTF(proFontWindows_data, proFontWindows_size);
   if (font == nullptr)
-    SDL_Log("Warning: AddFontFromMemoryCompressedTTF(proFontWindows): %s\n", SDL_GetError());
+    SDL_Log("Warning: AddFontFromMemoryCompressedTTF(proFontWindows) failed. Using default font.");
+  else
+    ImGui::PushFont(font, 18.0f);
 
   // ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.0f, 0.0f, 0.2f));
   // ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.95f, 0.95f, 0.95f, 0.6f));

@@ -7,8 +7,12 @@
 struct AppState {
   SDL_Window   *window;
   SDL_Renderer *renderer;
-  ImGuiIO      *imGuiIO;
-  // TODO: ImStyle? and replace all ImGui::GetStyle() by this?
+  const int     winWidth = 360;
+  const int     winHeight = 800;
+
+  ImGuiIO *imGuiIO;
+  // TODO: ImGuiStyle *imGuiStyle; replace all ImGui::GetStyle() by this?
+  bool     resizeImGUI = true;
 
   ~AppState() {
     SDL_DestroyRenderer(renderer);

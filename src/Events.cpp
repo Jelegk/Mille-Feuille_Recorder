@@ -1,6 +1,7 @@
 #include "Events.hpp"
 
 #include "SDL3/SDL_locale.h"
+#include "SDL3/SDL_log.h"
 #include "imgui.h"
 
 #include "AppState.hpp"
@@ -9,7 +10,7 @@
 
                            // TODO remove maybe_unused once its used. currently there to avoid error with -Weror
 SDL_AppResult processEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
-  // AppState *app = (AppState *)appstate;
+  AppState *app = (AppState *)appstate;
 
   switch (event->type) {
     case SDL_EVENT_QUIT :
@@ -27,9 +28,14 @@ SDL_AppResult processEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
     case SDL_EVENT_LOCALE_CHANGED :        {
       int          nLocales = 1;
       SDL_Locale **locales = SDL_GetPreferredLocales(&nLocales);
-      if (strcmp(locales[0]->language, "en") == 0) { }      // [ ]
-      else if (strcmp(locales[0]->language, "fr") == 0) { } // [ ]
+      if (locales == nullptr)
+        SDL_Log("Warning: SDL_GetPreferredLocales(): %s\n", SDL_GetError());
+      else {
+        if (strcmp(locales[0]->language, "en") == 0) { }      // [ ]
+        else if (strcmp(locales[0]->language, "fr") == 0) { } // [ ]
       // [ ] else ...
+      }
+      SDL_free(locales);
       break;
     }
 
@@ -51,7 +57,11 @@ SDL_AppResult processEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
       break;
 
     case SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED : { // (most likely: DPI changed)
-      float       winScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+      float winScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+      if (winScale == 0.0f) {
+        SDL_Log("Warning: SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay()): %s\n", SDL_GetError());
+        winScale = 1.0f;
+      }
       ImGuiStyle &style = ImGui::GetStyle();
       style.ScaleAllSizes(winScale);
       style.FontScaleDpi = winScale;
@@ -62,7 +72,11 @@ SDL_AppResult processEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
     case SDL_EVENT_WINDOW_HIDDEN :
     case SDL_EVENT_WINDOW_EXPOSED :
     case SDL_EVENT_WINDOW_MOVED :
+
     case SDL_EVENT_WINDOW_RESIZED :
+      app->resizeImGUI = true;
+      break;
+
     case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED :
     case SDL_EVENT_WINDOW_METAL_VIEW_RESIZED :
     case SDL_EVENT_WINDOW_MINIMIZED :

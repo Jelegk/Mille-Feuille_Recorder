@@ -7,5 +7,5 @@ So I'll do it myself.
 
 ### Built on Windows with VS Code
 
-To build yourself, Run Build Task in main.cpp. \
+To build yourself, Run Build Task (F6). \
 Running requires a built SDL.dll alongside the executable.

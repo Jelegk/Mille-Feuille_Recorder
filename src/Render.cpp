@@ -15,20 +15,26 @@ void renderImGUIFrame(void *appstate) {
   ImGui_ImplSDL3_NewFrame();
   ImGui::NewFrame();
 
-  // NOTE: Window probably wont be resizeable
-  // if (windowResized) { // FIX: must be edited between NewFrame() and its first element
-  //   ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always, ImVec2(0.0f, 0.0f)); // NOTE: probably not necessary
-  //   int *w = 0, *h = 0;
-  //   SDL_GetWindowSizeInPixels(app->window, w, h);
-  //   ImGui::SetNextWindowSize(ImVec2(*w, *h), ImGuiCond_Always);
-  //   windowResized = false;
-  // }
+  // TODO: find a way to call only at SDL_AppInit()
+  if (app->resizeImGUI) { // FIX: must be edited between NewFrame() and its first element
+    ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f), ImGuiCond_Always, ImVec2(0.0f, 0.0f));
+    ImGui::SetNextWindowSize(ImVec2(app->winWidth, app->winHeight), ImGuiCond_Always);
+    app->resizeImGUI = false;
+  }
 
-  const ImGuiWindowFlags imguiFlags = ImGuiWindowFlags_NoMove | // TODO: Do I like these?
+  const ImGuiWindowFlags imguiFlags = ImGuiWindowFlags_NoNav |
+                                      ImGuiWindowFlags_NoMove |
                                       ImGuiWindowFlags_NoDecoration |
+                                      // ImGuiWindowFlags_NoBackground |
                                       ImGuiWindowFlags_NoSavedSettings;
   ImGui::Begin("main_window", nullptr, imguiFlags);
-  // [ ] CONTENT
+
+  // MARK: ImGUI content here
+  ImGui::Button("OPEN");
+  float tmp = ImGui::GetItemRectSize().x;
+  ImGui::SameLine(0, ImGui::GetContentRegionAvail().x - tmp * 2);
+  ImGui::Button("SAVE");
+
   ImGui::End();
 
   // Rendering
