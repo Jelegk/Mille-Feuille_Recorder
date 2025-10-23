@@ -7,6 +7,7 @@
 #include "imgui_impl_sdlrenderer3.h"
 
 #include "AppState.hpp"
+#include "ImGuiStyleSheet.hpp"
 #include "ProFontWindows-ttf.h"
 #include "Events.hpp"
 #include "Render.hpp"
@@ -58,21 +59,22 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
   style.ScaleAllSizes(winScale);
   style.FontScaleDpi = winScale;
 
+  SetImGuiStyle();
+
   ImGui_ImplSDL3_InitForSDLRenderer(app->window, app->renderer);
   ImGui_ImplSDLRenderer3_Init(app->renderer);
 
-  style.FontSizeBase = 20.0f;
-  app->imGuiIO->Fonts->AddFontDefault();
-  ImFont *font = app->imGuiIO->Fonts->AddFontFromMemoryCompressedTTF(proFontWindows_data, proFontWindows_size);
-  if (font == nullptr)
+  // TODO: Consider Noto font
+  ImFont *f = app->imGuiIO->Fonts->AddFontFromMemoryCompressedTTF(proFontWindows_data, proFontWindows_size);
+  if (f == nullptr) {
     SDL_Log("Warning: AddFontFromMemoryCompressedTTF(proFontWindows) failed. Using default font.");
-  else
-    ImGui::PushFont(font, 18.0f);
-
-  // ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.8f, 0.0f, 0.0f, 0.2f));
-  // ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.95f, 0.95f, 0.95f, 0.6f));
-  // ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
-  // ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 4.0f);
+    app->imGuiIO->Fonts->AddFontDefault();
+    style.FontSizeBase = 13.0f;
+  }
+  else {
+    app->imGuiIO->FontDefault = f;
+    style.FontSizeBase = 20.0f;
+  }
 
   // ---------------------------------------------------------------------------
 

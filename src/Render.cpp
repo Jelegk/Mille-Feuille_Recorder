@@ -35,6 +35,8 @@ void renderImGUIFrame(void *appstate) {
   ImGui::SameLine(0, ImGui::GetContentRegionAvail().x - tmp * 2);
   ImGui::Button("SAVE");
 
+  ImGui::ShowStyleEditor();
+
   ImGui::End();
 
   // Rendering

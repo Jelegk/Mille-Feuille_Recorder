@@ -7,7 +7,7 @@
 struct AppState {
   SDL_Window   *window;
   SDL_Renderer *renderer;
-  const int     winWidth = 360;
+  const int     winWidth = 800;
   const int     winHeight = 800;
 
   ImGuiIO *imGuiIO;
