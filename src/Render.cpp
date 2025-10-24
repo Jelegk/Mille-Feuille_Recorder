@@ -7,6 +7,15 @@
 
 #include "AppState.hpp"
 
+void alignNextImguitextElement(const char *textElement, float alignment) {
+  float size = ImGui::CalcTextSize(textElement).x + ImGui::GetStyle().FramePadding.x * 2.0f;
+  float avail = ImGui::GetContentRegionAvail().x;
+
+  float offset = (avail - size) * alignment;
+  if (offset > 0.0f)
+    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
+}
+
 void renderImGUIFrame(void *appstate) {
   AppState *app = (AppState *)appstate;
 
@@ -22,21 +31,30 @@ void renderImGUIFrame(void *appstate) {
     app->resizeImGUI = false;
   }
 
-  const ImGuiWindowFlags imguiFlags = ImGuiWindowFlags_NoNav |
-                                      ImGuiWindowFlags_NoMove |
-                                      ImGuiWindowFlags_NoDecoration |
+  const ImGuiWindowFlags imguiFlags = // ImGuiWindowFlags_NoNav |
+    ImGuiWindowFlags_NoMove |
+    ImGuiWindowFlags_NoDecoration |
                                       // ImGuiWindowFlags_NoBackground |
-                                      ImGuiWindowFlags_NoSavedSettings;
+    ImGuiWindowFlags_NoSavedSettings;
   ImGui::Begin("main_window", nullptr, imguiFlags);
+  {
+    float  winWidth = ImGui::GetContentRegionAvail().x;
+    ImVec2 headerBtnWidth = ImVec2(winWidth / 2, 0);
+    ImGui::Button("GALLERY", headerBtnWidth);
+    ImGui::SameLine();
+    ImGui::Button("SAVE", headerBtnWidth);
 
-  // MARK: ImGUI content here
-  ImGui::Button("OPEN");
-  float tmp = ImGui::GetItemRectSize().x;
-  ImGui::SameLine(0, ImGui::GetContentRegionAvail().x - tmp * 2);
-  ImGui::Button("SAVE");
+    ImGui::NewLine();
+    alignNextImguitextElement("New Recording");
+    ImGui::Text("New Recording");
 
-  ImGui::ShowStyleEditor();
+    ImVec2 bodySize = ImGui::GetContentRegionAvail();
+    ImGui::BeginChild("body", bodySize, ImGuiChildFlags_NavFlattened);
+    {
 
+    }
+    ImGui::EndChild();
+  }
   ImGui::End();
 
   // Rendering
@@ -46,13 +64,4 @@ void renderImGUIFrame(void *appstate) {
   SDL_RenderClear(app->renderer);
   ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), app->renderer);
   SDL_RenderPresent(app->renderer);
-}
-
-void alignNextImguitextElement(const char *textElement, float alignment) {
-  float size = ImGui::CalcTextSize(textElement).x + ImGui::GetStyle().FramePadding.x * 2.0f;
-  float avail = ImGui::GetContentRegionAvail().x;
-
-  float offset = (avail - size) * alignment;
-  if (offset > 0.0f)
-    ImGui::SetCursorPosX(ImGui::GetCursorPosX() + offset);
 }

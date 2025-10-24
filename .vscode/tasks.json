@@ -10,10 +10,13 @@
                 "-g",
                 "-I", "${workspaceFolder}/include",
                 "-I", "${workspaceFolder}/include/imgui-1.92.4",
+                "-I", "${workspaceFolder}/include/implot-3da8bd3",
                 "${workspaceFolder}/src/Events.cpp",
                 "${workspaceFolder}/src/Render.cpp",
+                "${workspaceFolder}/src/ImGuiStyler.cpp",
                 "${workspaceFolder}/src/main.cpp",
                 "-L", "${workspaceFolder}/lib",
+                "-l", "implot",
                 "-l", "imgui",
                 "-l", "SDL3.dll",
                 "-o", "${workspaceFolder}/build/Mille-Feuille Recorder.exe"

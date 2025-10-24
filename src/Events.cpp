@@ -5,6 +5,7 @@
 #include "imgui.h"
 
 #include "AppState.hpp"
+#include "ImGuiStyler.hpp"
 
 #include <cstring>
 
@@ -41,9 +42,9 @@ SDL_AppResult processEvent([[maybe_unused]] void *appstate, SDL_Event *event) {
 
     case SDL_EVENT_SYSTEM_THEME_CHANGED : // TODO: test if it works
       if (SDL_GetSystemTheme() == SDL_SYSTEM_THEME_LIGHT)
-        ImGui::StyleColorsLight();
+        ImGuiStyler::StyleColorsCustomLight();
       else
-        ImGui::StyleColorsDark();
+        ImGuiStyler::StyleColorsCustomDark();
       break;
 
     case SDL_EVENT_DISPLAY_ORIENTATION :

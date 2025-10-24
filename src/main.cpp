@@ -7,7 +7,7 @@
 #include "imgui_impl_sdlrenderer3.h"
 
 #include "AppState.hpp"
-#include "ImGuiStyleSheet.hpp"
+#include "ImGuiStyler.hpp"
 #include "ProFontWindows-ttf.h"
 #include "Events.hpp"
 #include "Render.hpp"
@@ -51,15 +51,14 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
   app->imGuiIO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
   // app->imGuiIO->ConfigDpiScaleFonts = true; // TODO: find wehre it exists. For now, it is manually changed on SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
 
-  // TODO: test if SDL_EVENT_SYSTEM_THEME_CHANGED is sent at init, otherwise keep this line
-  ImGui::StyleColorsDark();
-
   // TODO: test if SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED is sent at init, otherwise keep this block
   ImGuiStyle &style = ImGui::GetStyle();
   style.ScaleAllSizes(winScale);
   style.FontScaleDpi = winScale;
 
-  SetImGuiStyle();
+  ImGuiStyler::StyleFormat();
+  // TODO: test if SDL_EVENT_SYSTEM_THEME_CHANGED is sent at init, otherwise keep this line
+  SDL_GetSystemTheme() == SDL_SYSTEM_THEME_LIGHT ? ImGuiStyler::StyleColorsCustomLight() : ImGuiStyler::StyleColorsCustomDark();
 
   ImGui_ImplSDL3_InitForSDLRenderer(app->window, app->renderer);
   ImGui_ImplSDLRenderer3_Init(app->renderer);
@@ -111,3 +110,15 @@ void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result) {
 
   delete (AppState *)appstate;
 }
+
+// [ ] Have entire ImGUI content scale up/down with SDL window resize
+// [ ] Integrate plotting element for audio loudness
+// [ ]  ┕ (current input loudmeter? track style.framebg color dynamically changes if loud?)
+// [ ] Plan "flexbox" (child widget?) layout with mutliple tracks
+// [ ] Revise stylesheet
+// [ ] Touch inputs
+// [ ] Record voice (acces to mic)
+// [ ]  ┕ (add sensor functionality?)
+// [ ] Buffers for layers
+// [ ] I/O (saving on filesystem)
+// [ ] Run on Android
