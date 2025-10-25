@@ -1,18 +1,17 @@
 #define SDL_MAIN_USE_CALLBACKS
 #include "SDL3/SDL.h"
 #include "SDL3/SDL_main.h"
-
 #include "imgui.h"
 #include "imgui_impl_sdl3.h"
 #include "imgui_impl_sdlrenderer3.h"
+#include "implot.h"
 
 #include "AppState.hpp"
 #include "ImGuiStyler.hpp"
+#include "ImPlotStyler.hpp"
 #include "ProFontWindows-ttf.h"
 #include "Events.hpp"
 #include "Render.hpp"
-
-#include <iostream>
 
 // MARK: SDL_AppInit
 SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
@@ -40,41 +39,42 @@ SDL_AppResult SDL_AppInit([[maybe_unused]] void **appstate, [[maybe_unused]] int
 
   if (!SDL_SetWindowPosition(app->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED))
     SDL_Log("Warning: SDL_SetWindowPosition(): %s\n", SDL_GetError());
-  if (!SDL_ShowWindow(app->window))
-    SDL_Log("Error: SDL_ShowWindow(): %s\n", SDL_GetError());
 
-  // -------------------------------- ImGUI ------------------------------------
+  if (!SDL_ShowWindow(app->window)) {
+    SDL_Log("Error: SDL_ShowWindow(): %s\n", SDL_GetError());
+    return SDL_APP_FAILURE;
+  }
+
+  // --------------------------- ImGUI / ImPlot --------------------------------
   IMGUI_CHECKVERSION();
   ImGui::CreateContext();
+  ImPlot::CreateContext();
+
   app->imGuiIO = &ImGui::GetIO();
+  app->imGuiIO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // ImGuiConfigFlags_IsTouchScreen
   app->imGuiIO->IniFilename = nullptr; // Suppress Dear ImGui's automatic ini file handling
-  app->imGuiIO->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-  // app->imGuiIO->ConfigDpiScaleFonts = true; // TODO: find wehre it exists. For now, it is manually changed on SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
-
-  // TODO: test if SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED is sent at init, otherwise keep this block
-  ImGuiStyle &style = ImGui::GetStyle();
-  style.ScaleAllSizes(winScale);
-  style.FontScaleDpi = winScale;
-
-  ImGuiStyler::StyleFormat();
-  // TODO: test if SDL_EVENT_SYSTEM_THEME_CHANGED is sent at init, otherwise keep this line
-  SDL_GetSystemTheme() == SDL_SYSTEM_THEME_LIGHT ? ImGuiStyler::StyleColorsCustomLight() : ImGuiStyler::StyleColorsCustomDark();
-
-  ImGui_ImplSDL3_InitForSDLRenderer(app->window, app->renderer);
-  ImGui_ImplSDLRenderer3_Init(app->renderer);
+  // app->imGuiIO->ConfigDpiScaleFonts = true; // TODO: get git branch that supports it? For now, it is manually changed on SDL_EVENT_DISPLAY_CONTENT_SCALE_CHANGED
 
   // TODO: Consider Noto font
   ImFont *f = app->imGuiIO->Fonts->AddFontFromMemoryCompressedTTF(proFontWindows_data, proFontWindows_size);
   if (f == nullptr) {
     SDL_Log("Warning: AddFontFromMemoryCompressedTTF(proFontWindows) failed. Using default font.");
     app->imGuiIO->Fonts->AddFontDefault();
-    style.FontSizeBase = 13.0f;
+    ImGui::GetStyle().FontSizeBase = 13.0f;
   }
   else {
     app->imGuiIO->FontDefault = f;
-    style.FontSizeBase = 20.0f;
+    ImGui::GetStyle().FontSizeBase = 20.0f;
   }
 
+  ImGuiStyler::StyleFormat();
+  SDL_GetSystemTheme() == SDL_SYSTEM_THEME_LIGHT ? ImGuiStyler::StyleColorsCustomLight() : ImGuiStyler::StyleColorsCustomDark(); // TODO: test if SDL_EVENT_SYSTEM_THEME_CHANGED is sent at init, otherwise keep this line
+
+  ImPlotStyler::StyleFormat();
+  ImPlotStyler::StyleColors();
+
+  ImGui_ImplSDL3_InitForSDLRenderer(app->window, app->renderer);
+  ImGui_ImplSDLRenderer3_Init(app->renderer);
   // ---------------------------------------------------------------------------
 
   return SDL_APP_CONTINUE;
@@ -91,6 +91,7 @@ SDL_AppResult SDL_AppEvent(void *appstate, SDL_Event *event) {
 // MARK: SDL_AppIterate
 SDL_AppResult SDL_AppIterate(void *appstate) {
   // TODO: is it necessary with SDL_EVENT_WINDOW_HIDDEN or SDL_EVENT_WINDOW_MINIMIZED ?
+  //       or literally the fact that the app uses the 4 main callbacks?
   // if (SDL_GetWindowFlags(app->window) & SDL_WINDOW_MINIMIZED) {
   //   SDL_Delay(100);
   //   return SDL_APP_CONTINUE;
@@ -106,6 +107,7 @@ SDL_AppResult SDL_AppIterate(void *appstate) {
 void SDL_AppQuit(void *appstate, [[maybe_unused]] SDL_AppResult result) {
   ImGui_ImplSDLRenderer3_Shutdown();
   ImGui_ImplSDL3_Shutdown();
+  ImPlot::DestroyContext();
   ImGui::DestroyContext();
 
   delete (AppState *)appstate;

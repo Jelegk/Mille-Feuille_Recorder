@@ -7,11 +7,10 @@
 struct AppState {
   SDL_Window   *window;
   SDL_Renderer *renderer;
-  const int     winWidth = 800;
+  const int     winWidth = 340;
   const int     winHeight = 800;
 
   ImGuiIO *imGuiIO;
-  // TODO: ImGuiStyle *imGuiStyle; replace all ImGui::GetStyle() by this?
   bool     resizeImGUI = true;
 
   ~AppState() {

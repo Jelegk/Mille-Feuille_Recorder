@@ -14,6 +14,7 @@
                 "${workspaceFolder}/src/Events.cpp",
                 "${workspaceFolder}/src/Render.cpp",
                 "${workspaceFolder}/src/ImGuiStyler.cpp",
+                "${workspaceFolder}/src/ImPlotStyler.cpp",
                 "${workspaceFolder}/src/main.cpp",
                 "-L", "${workspaceFolder}/lib",
                 "-l", "implot",

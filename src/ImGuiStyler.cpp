@@ -1,9 +1,14 @@
 #include "ImGuiStyler.hpp"
 
+#include "SDL3/SDL_video.h"
+
 void ImGuiStyler::StyleFormat() {
   ImGuiStyle &style = ImGui::GetStyle();
 
-// float       FontSizeBase;               // Current base font size before external global factors are applied. Use PushFont(NULL, size) to modify. Use ImGui::GetFontSize() to obtain scaled value.
+  float winScale = SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay());
+  style.ScaleAllSizes(winScale);
+  style.FontScaleDpi = winScale;
+// float       FontSizeBase;  // NOTE: set in main.cpp             // Current base font size before external global factors are applied. Use PushFont(NULL, size) to modify. Use ImGui::GetFontSize() to obtain scaled value.
 // float       FontScaleMain;              // Main global scale factor. May be set by application once, or exposed to end-user.
 // float       FontScaleDpi;               // Additional global scale factor from viewport/monitor contents scale. When io.ConfigDpiScaleFonts is enabled, this is automatically overwritten when changing monitor DPI.
 
@@ -22,14 +27,14 @@ void ImGuiStyler::StyleFormat() {
   style.PopupBorderSize = 1.0f;// Thickness of border around popup/tooltip windows. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
   style.FramePadding = ImVec2(12.0f, 6.0f);// Padding within a framed rectangle (used by most widgets).
   style.FrameRounding = 7.0f;// Radius of frame corners rounding. Set to 0.0f to have rectangular frame (used by most widgets).
-  style.FrameBorderSize = 0.0f;// Thickness of border around frames. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
+  style.FrameBorderSize = 1.0f;// Thickness of border around frames. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
   style.ItemSpacing = ImVec2(8.0f, 4.0f);// Horizontal and vertical spacing between widgets/lines.
   style.ItemInnerSpacing = ImVec2(4.0f, 4.0f);// Horizontal and vertical spacing between within elements of a composed widget (e.g. a slider and its label).
   style.CellPadding = ImVec2(4.0f, 20.0f); // Padding within a table cell. Cellpadding.x is locked for entire table. CellPadding.y may be altered between different rows.
 // ImVec2      TouchExtraPadding;          // Expand reactive bounding box for touch-based system where touch position is not accurate enough. Unfortunately we don't sort widgets so priority on overlap will always be given to the first widget. So don't grow this too much!
   style.IndentSpacing = 8.0f;// Horizontal indentation when e.g. entering a tree node. Generally == (FontSize + FramePadding.x*2).
   style.ColumnsMinSpacing = 14.0f;// Minimum horizontal spacing between two columns. Preferably > (FramePadding.x + 1).
-  style.ScrollbarSize = 3.0f; // TODO: try 0.0f   // Width of the vertical scrollbar, Height of the horizontal scrollbar.
+  style.ScrollbarSize = 0.0f;   // Width of the vertical scrollbar, Height of the horizontal scrollbar.
   style.ScrollbarRounding = 3.0f;// Radius of grab corners for scrollbar.
 // float       ScrollbarPadding;           // Padding of scrollbar grab within its frame (same for both axises).
   style.GrabMinSize = 20.0f;// Minimum width/height of a grab box for slider/scrollbar.
@@ -75,6 +80,7 @@ void ImGuiStyler::StyleFormat() {
 // ImGuiHoveredFlags HoverFlagsForTooltipMouse;// Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using mouse.
 // ImGuiHoveredFlags HoverFlagsForTooltipNav;  // Default flags when using IsItemHovered(ImGuiHoveredFlags_ForTooltip) or BeginItemTooltip()/SetItemTooltip() while using keyboard/gamepad.
 }
+// TODO
 
 void ImGuiStyler::StyleColorsCustom(ImVec4 txt,
                                     ImVec4 bgLr, ImVec4 bgL, ImVec4 bg, ImVec4 bgD, ImVec4 bgDr,
@@ -87,8 +93,8 @@ void ImGuiStyler::StyleColorsCustom(ImVec4 txt,
   style.Colors[ImGuiCol_WindowBg] = bg;                                         // Background of normal windows
   style.Colors[ImGuiCol_ChildBg] = bgD;                                         // Background of child windows
   style.Colors[ImGuiCol_PopupBg] = bgL;                                         // Background of popups, menus, tooltips windows
-  style.Colors[ImGuiCol_Border] = acc;
-  style.Colors[ImGuiCol_BorderShadow] = accD;
+  style.Colors[ImGuiCol_Border] = accL;
+  style.Colors[ImGuiCol_BorderShadow] = acc;
   style.Colors[ImGuiCol_FrameBg] = accD;                                        // Background of checkbox, radio button, plot, slider, text input
   style.Colors[ImGuiCol_FrameBgHovered] = acc;
   style.Colors[ImGuiCol_FrameBgActive] = accL;
@@ -146,19 +152,19 @@ void ImGuiStyler::StyleColorsCustom(ImVec4 txt,
 void ImGuiStyler::StyleColorsCustomDark() {
   ImVec4 text = ImVec4(0.9, 0.9, 0.9, 1.0f); // white
 
-  ImVec4 bgLighter = ImVec4(0.21961f, 0.20392f, 0.18431f, 1.0f); // grey
-  ImVec4 bgLight =   ImVec4(0.18039f, 0.16471f, 0.14902f, 1.0f);
-  ImVec4 bg =        ImVec4(0.13725f, 0.12549f, 0.11373f, 1.0f);
-  ImVec4 bgDark =    ImVec4(0.09412f, 0.08627f, 0.07843f, 1.0f);
-  ImVec4 bgDarker =  ImVec4(0.05490f, 0.04706f, 0.04314f, 1.0f);
+  ImVec4 bgLighter = ImVec4(0.217f, 0.204f, 0.184f, 1.0f); // grey
+  ImVec4 bgLight =   ImVec4(0.180f, 0.165f, 0.149f, 1.0f);
+  ImVec4 bg =        ImVec4(0.137f, 0.125f, 0.114f, 1.0f);
+  ImVec4 bgDark =    ImVec4(0.094f, 0.086f, 0.078f, 1.0f);
+  ImVec4 bgDarker =  ImVec4(0.055f, 0.047f, 0.043f, 1.0f);
 
-  ImVec4 accentlight = ImVec4(0.61176f, 0.03529f, 0.16078f, 1.0f); // red
-  ImVec4 accent =      ImVec4(0.53725f, 0.00000f, 0.15294f, 1.0f);
-  ImVec4 accentDark =  ImVec4(0.40784f, 0.00000f, 0.13725f, 1.0f);
+  ImVec4 accentlight = ImVec4(0.612f, 0.035f, 0.161f, 1.0f); // red
+  ImVec4 accent =      ImVec4(0.537f, 0.000f, 0.153f, 1.0f);
+  ImVec4 accentDark =  ImVec4(0.408f, 0.000f, 0.137f, 1.0f);
 
-  ImVec4 accentAltLight = ImVec4(0.78431f, 0.61961f, 0.42745f, 1.0f); // beige
-  ImVec4 accentAlt =      ImVec4(0.74118f, 0.54510f, 0.31765f, 1.0f);
-  ImVec4 accentAltDark =  ImVec4(0.60000f, 0.42745f, 0.22745f, 1.0f);
+  ImVec4 accentAltLight = ImVec4(0.784f, 0.620f, 0.427f, 1.0f); // beige
+  ImVec4 accentAlt =      ImVec4(0.741f, 0.545f, 0.318f, 1.0f);
+  ImVec4 accentAltDark =  ImVec4(0.600f, 0.427f, 0.227f, 1.0f);
 
   StyleColorsCustom(text, bgLighter, bgLight, bg, bgDark, bgDarker, accentlight, accent, accentDark, accentAltLight, accentAlt, accentAltDark);
 }
@@ -166,19 +172,19 @@ void ImGuiStyler::StyleColorsCustomDark() {
 void ImGuiStyler::StyleColorsCustomLight() {
   ImVec4 text = ImVec4(0.1, 0.1, 0.1, 1.0f); // black
 
-  ImVec4 bgLighter = ImVec4(0.21961f, 0.20392f, 0.18431f, 1.0f); // white // [ ]
-  ImVec4 bgLight =   ImVec4(0.18039f, 0.16471f, 0.14902f, 1.0f);
-  ImVec4 bg =        ImVec4(0.13725f, 0.12549f, 0.11373f, 1.0f);
-  ImVec4 bgDark =    ImVec4(0.09412f, 0.08627f, 0.07843f, 1.0f);
-  ImVec4 bgDarker =  ImVec4(0.05490f, 0.04706f, 0.04314f, 1.0f);
+  ImVec4 bgLighter = ImVec4(0.976f, 0.961f, 0.941f, 1.0f); // white
+  ImVec4 bgLight =   ImVec4(0.953f, 0.922f, 0.890f, 1.0f);
+  ImVec4 bg =        ImVec4(0.929f, 0.886f, 0.835f, 1.0f);
+  ImVec4 bgDark =    ImVec4(0.871f, 0.788f, 0.694f, 1.0f);
+  ImVec4 bgDarker =  ImVec4(0.839f, 0.741f, 0.624f, 1.0f);
 
-  ImVec4 accentlight = ImVec4(0.61176f, 0.03529f, 0.16078f, 1.0f); // red
-  ImVec4 accent =      ImVec4(0.53725f, 0.00000f, 0.15294f, 1.0f);
-  ImVec4 accentDark =  ImVec4(0.40784f, 0.00000f, 0.13725f, 1.0f);
+  ImVec4 accentlight = ImVec4(0.612f, 0.035f, 0.161f, 1.0f); // red
+  ImVec4 accent =      ImVec4(0.537f, 0.000f, 0.153f, 1.0f);
+  ImVec4 accentDark =  ImVec4(0.408f, 0.000f, 0.137f, 1.0f);
 
-  ImVec4 accentAltLight = ImVec4(0.78431f, 0.61961f, 0.42745f, 1.0f); // brown // [ ]
-  ImVec4 accentAlt =      ImVec4(0.74118f, 0.54510f, 0.31765f, 1.0f);
-  ImVec4 accentAltDark =  ImVec4(0.60000f, 0.42745f, 0.22745f, 1.0f);
+  ImVec4 accentAltLight = ImVec4(0.282f, 0.208f, 0.122f, 1.0f); // brown
+  ImVec4 accentAlt =      ImVec4(0.212f, 0.157f, 0.090f, 1.0f);
+  ImVec4 accentAltDark =  ImVec4(0.141f, 0.106f, 0.059f, 1.0f);
 
   StyleColorsCustom(text, bgLighter, bgLight, bg, bgDark, bgDarker, accentlight, accent, accentDark, accentAltLight, accentAlt, accentAltDark);
 }

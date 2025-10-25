@@ -1,8 +1,8 @@
 #pragma once
 
 /// @brief Based on https://github.com/ocornut/imgui/discussions/3862#discussioncomment-422097
-/// @param textElement The text that is rendered. Used to calculate its px width
 /// @param alignment Normalized (0.5f = centered)
-void alignNextImguitextElement(const char *textElement, float alignment = 0.5f);
+/// @param fmt The text that is rendered. Same as passing a formatted string to printf, with its arguments after.
+void ImGuiTextAligned(float alignment, const char *fmt, ...);
 
 void renderImGUIFrame(void *appstate);
